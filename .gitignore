@@ -1,0 +1,42 @@
+# .gitignore
+
+# ----------------- #
+# Arquivos Globais e do Sistema Operacional
+# ----------------- #
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# ----------------- #
+# Backend (Django)
+# ----------------- #
+# Ambiente virtual
+venv/
+
+# Banco de dados de desenvolvimento
+backend/db.sqlite3
+
+# Arquivos de cache do Python
+backend/__pycache__/
+backend/*/__pycache__/
+backend/*/*/__pycache__/
+*.pyc
+
+# Arquivos de log e outros
+*.log
+.env
+
+# ----------------- #
+# Frontend (React)
+# ----------------- #
+# Dependências
+frontend/node_modules/
+
+# Arquivos de build de produção
+frontend/build/
+
+# Logs de erro e debug
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
