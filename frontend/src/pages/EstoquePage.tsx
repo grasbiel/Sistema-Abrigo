@@ -15,7 +15,7 @@ interface PaginatedProductsResponse {
 
 // Definição das colunas da nossa tabela
 const columns: GridColDef[] = [
-    { field: 'nome', headerName: 'Nome do Produto', width: 300 },
+    { field: 'nome', headerName: 'Descrição do Produto', width: 400 },
     { 
         field: 'quantidade_em_estoque', 
         headerName: 'Em Estoque', 
@@ -32,9 +32,8 @@ const columns: GridColDef[] = [
         align: 'center',
         headerAlign: 'center',
     },
-    { field: 'data_validade', headerName: 'Validade', width: 150 },
-    // Podemos adicionar colunas de ações no futuro (ex: editar, excluir)
-];
+]
+
 
 const EstoquePage: React.FC = () => {
     const [produtos, setProdutos] = useState<Produto[]>([]);
