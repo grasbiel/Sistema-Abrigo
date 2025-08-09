@@ -4,6 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.models import Group
+from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import *
 from .serializers import *
 
@@ -99,3 +100,6 @@ class IndicadoresView(APIView):
             'distribuicao_idade': distribuicao_idade,
             'produtos_em_alerta': produtos_em_alerta,
         })
+    
+class MyTokenObtainPairView (TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
