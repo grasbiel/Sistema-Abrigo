@@ -1,8 +1,7 @@
 // frontend/src/api/axiosConfig.ts
 
 import axios, { InternalAxiosRequestConfig, AxiosError } from 'axios';
-import { jwtDecode } from 'jwt-decode';
-import { User, AuthTokens } from '../types';
+import { AuthTokens } from '../types';
 
 const baseURL = 'http://127.0.0.1:8000/api/';
 
