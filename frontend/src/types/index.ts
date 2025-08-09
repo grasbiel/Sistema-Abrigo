@@ -2,6 +2,7 @@
 export interface User {
   user_id: number;
   username: string;
+  groups: string[];
 }
 
 // Define a forma dos tokens que recebemos da API
@@ -29,4 +30,16 @@ export interface Produto {
   data_validade: string | null;
   quantidade_em_estoque: number;
   quantidade_minima: number;
+}
+
+// frontend/src/types/index.ts
+export interface Movimentacao {
+  id: number;
+  produto: number;
+  produto_nome: string;
+  quantidade: number;
+  tipo: 'entrada' | 'saida';
+  status: 'pendente' | 'aprovada' | 'recusada';
+  registrado_por_nome: string;
+  data_movimentacao: string;
 }
