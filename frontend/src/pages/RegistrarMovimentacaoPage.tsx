@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Box, Typography, Paper, FormControl, InputLabel, Select, MenuItem, RadioGroup, FormControlLabel, Radio, TextField, Button, Alert, CircularProgress } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { Box, Typography, Paper, FormControl, InputLabel, Select, MenuItem, RadioGroup, FormControlLabel, Radio, TextField, Button, Alert, CircularProgress, SelectChangeEvent } from '@mui/material';
 
 import apiClient from '../api/axiosConfig';
 import { Produto } from '../types';
 
-// Interface para a resposta paginada da nossa API
 interface PaginatedProductsResponse {
-    count: number;
     results: Produto[];
 }
 
@@ -15,9 +13,11 @@ const RegistrarMovimentacaoPage: React.FC = () => {
     const [produtos, setProdutos] = useState<Produto[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     
+    // Estados do formulário
     const [produtoSelecionado, setProdutoSelecionado] = useState<string>('');
     const [tipoMovimentacao, setTipoMovimentacao] = useState<'entrada' | 'saida'>('entrada');
-    const [quantidade, setQuantidade] = useState<number>(1);
+    const [quantidade, setQuantidade] = useState<string>('1');
+    const [dataValidade, setDataValidade] = useState<string>(''); // Novo estado para validade
     const [justificativa, setJustificativa] = useState<string>('');
     
     const [error, setError] = useState<string>('');
@@ -28,14 +28,8 @@ const RegistrarMovimentacaoPage: React.FC = () => {
         const fetchAllProducts = async () => {
             setLoading(true);
             try {
-                // CORREÇÃO AQUI:
-                // 1. Pedimos uma página grande para garantir que todos os produtos venham para o dropdown.
-                // 2. Esperamos o objeto de resposta paginada.
                 const response = await apiClient.get<PaginatedProductsResponse>('/produtos/?page_size=1000');
-                
-                // 3. Acessamos o array de produtos dentro da chave 'results'.
                 setProdutos(response.data.results);
-
             } catch (err) {
                 setError('Não foi possível carregar a lista de produtos.');
             } finally {
@@ -50,17 +44,22 @@ const RegistrarMovimentacaoPage: React.FC = () => {
         setError('');
         setSuccess('');
 
-        if (!produtoSelecionado || quantidade <= 0) {
-            setError('Por favor, preencha todos os campos corretamente.');
+        if (!produtoSelecionado || parseFloat(quantidade) <= 0) {
+            setError('Por favor, preencha todos os campos obrigatórios corretamente.');
             return;
         }
 
-        const payload = {
+        const payload: any = {
             produto: parseInt(produtoSelecionado),
-            quantidade,
+            quantidade: parseFloat(quantidade),
             tipo: tipoMovimentacao,
             justificativa,
         };
+
+        // Adiciona a data de validade ao payload APENAS se for uma entrada e se foi preenchida
+        if (tipoMovimentacao === 'entrada' && dataValidade) {
+            payload.data_validade = dataValidade;
+        }
 
         try {
             await apiClient.post('/movimentacoes/', payload);
@@ -71,33 +70,22 @@ const RegistrarMovimentacaoPage: React.FC = () => {
         }
     };
 
-    if (loading) {
-        return <CircularProgress />;
-    }
+    if (loading) return <CircularProgress />;
 
     return (
         <Paper elevation={3} sx={{ p: 3 }}>
-            <Typography variant="h4" gutterBottom>
-                Registrar Movimentação de Estoque
-            </Typography>
-            <Link to="/dashboard">Voltar para o Dashboard</Link>
-
+            <Typography variant="h4" gutterBottom>Registrar Movimentação de Estoque</Typography>
+            
             <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
                 {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
                 {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
 
                 <FormControl fullWidth margin="normal" required>
                     <InputLabel id="produto-select-label">Produto</InputLabel>
-                    <Select
-                        labelId="produto-select-label"
-                        id="produto"
-                        value={produtoSelecionado}
-                        label="Produto"
-                        onChange={e => setProdutoSelecionado(e.target.value)}
-                    >
+                    <Select labelId="produto-select-label" value={produtoSelecionado} label="Produto" onChange={(e: SelectChangeEvent) => setProdutoSelecionado(e.target.value)}>
                         <MenuItem value=""><em>Selecione um produto</em></MenuItem>
                         {produtos.map(p => (
-                            <MenuItem key={p.id} value={p.id}>{p.nome}</MenuItem>
+                            <MenuItem key={p.id} value={p.id}>{p.display_name}</MenuItem>
                         ))}
                     </Select>
                 </FormControl>
@@ -109,30 +97,24 @@ const RegistrarMovimentacaoPage: React.FC = () => {
                     </RadioGroup>
                 </FormControl>
                 
-                <TextField
-                    label="Quantidade"
-                    type="number"
-                    value={quantidade}
-                    onChange={e => setQuantidade(parseInt(e.target.value))}
-                    InputProps={{ inputProps: { min: 1 } }}
-                    fullWidth
-                    margin="normal"
-                    required
-                />
+                <TextField label="Quantidade" type="number" value={quantidade} onChange={e => setQuantidade(e.target.value)} InputProps={{ inputProps: { min: 0.01, step: "0.01" } }} fullWidth margin="normal" required />
 
-                <TextField
-                    label="Justificativa (opcional para entradas)"
-                    multiline
-                    rows={3}
-                    value={justificativa}
-                    onChange={e => setJustificativa(e.target.value)}
-                    fullWidth
-                    margin="normal"
-                />
+                {/* --- CAMPO CONDICIONAL PARA DATA DE VALIDADE --- */}
+                {tipoMovimentacao === 'entrada' && (
+                    <TextField
+                        label="Data de Validade (opcional)"
+                        type="date"
+                        value={dataValidade}
+                        onChange={e => setDataValidade(e.target.value)}
+                        fullWidth
+                        margin="normal"
+                        InputLabelProps={{ shrink: true }}
+                    />
+                )}
+                
+                <TextField label="Justificativa (opcional)" multiline rows={3} value={justificativa} onChange={e => setJustificativa(e.target.value)} fullWidth margin="normal" />
 
-                <Button type="submit" variant="contained" sx={{ mt: 2 }}>
-                    Registrar Movimentação
-                </Button>
+                <Button type="submit" variant="contained" sx={{ mt: 2 }}>Registrar Movimentação</Button>
             </Box>
         </Paper>
     );
