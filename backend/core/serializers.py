@@ -1,5 +1,6 @@
 # core/serializers.py
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import *
 
 class UsuarioSerializer(serializers.ModelSerializer):
@@ -36,3 +37,15 @@ class NotificacaoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notificacao
         fields = '__all__'
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls,user):
+        token = super().get_token(user)
+
+        # Adiciona os nomes dos grupos do usuário ao payload do token
+        token['groups'] = [group.name for group in user.groups.all()]
+        token['username'] = user.username
+
+        return token
+    
