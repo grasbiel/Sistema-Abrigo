@@ -11,7 +11,8 @@ from .models import Usuario, Departamento, Produto, Crianca, Movimentacao, Notif
 
 @admin.register(Usuario)
 class UsuarioAdmin(admin.ModelAdmin):
-    list_display = ('username', 'first_name', 'last_name', 'is_staff')
+    list_display = ('username', 'first_name', 'last_name', 'is_staff', 'is_active')
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
 
 @admin.register(Departamento)
 class DepartamentoAdmin(admin.ModelAdmin):
@@ -19,33 +20,20 @@ class DepartamentoAdmin(admin.ModelAdmin):
 
 @admin.register(Produto)
 class ProdutoAdmin(admin.ModelAdmin):
-    list_display = ('nome', 'departamento', 'quantidade_em_estoque', 'quantidade_minima', 'data_validade')
+    list_display = ('__str__', 'departamento', 'quantidade_em_estoque', 'quantidade_minima')
     list_filter = ('departamento',)
-    search_fields = ('nome',)
+    search_fields = ('nome', 'marca', 'codigo_barras')
 
 @admin.register(Crianca)
 class CriancaAdmin(admin.ModelAdmin):
-    list_display = ('nome_completo', 'idade', 'status_acolhimento', 'data_entrada', 'data_saida')
-    list_filter = ('status_acolhimento',)
+    list_display = ('nome_completo', 'idade', 'status_acolhimento', 'data_entrada')
     search_fields = ('nome_completo',)
 
 @admin.register(Movimentacao)
 class MovimentacaoAdmin(admin.ModelAdmin):
-    list_display = ('produto', 'departamento', 'tipo', 'quantidade', 'status', 'registrado_por', 'data_movimentacao')
+    list_display = ('produto', 'tipo', 'quantidade', 'status', 'data_validade', 'registrado_por')
     list_filter = ('status', 'tipo', 'produto__departamento')
-    search_fields = ('produto__nome',)
-    
-    # Adicionado para filtrar o departamento na lista
-    def departamento(self, obj):
-        return obj.produto.departamento
-    departamento.short_description = 'Departamento'
-
-    # Esta função busca o nome do departamento através da relação para exibir na lista
-    @admin.display(description='Departamento', ordering='produto__departamento')
-    def departamento(self, obj):
-        if obj.produto:
-            return obj.produto.departamento
-        return "N/A"
+    search_fields = ('produto__nome', 'produto__marca')
 
 
 @admin.register(Notificacao)
