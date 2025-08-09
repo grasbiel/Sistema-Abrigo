@@ -145,5 +145,8 @@ REST_FRAMEWORK = {
     # Opcional, mas boa prática: Define que todas as rotas são protegidas por padrão
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-    ]
+    ],
+
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE':10,
 }
