@@ -24,22 +24,27 @@ export interface Indicadores {
 
 // Define a forma de um objeto Produto
 export interface Produto {
-  id: number;
-  nome: string;
-  departamento: number;
-  data_validade: string | null;
-  quantidade_em_estoque: number;
-  quantidade_minima: number;
+  id: number
+  nome: string
+  marca: string | null
+  unidade_medida: string
+  tamanho: number | null
+  departamento: number
+  descricao_adicional: string | null
+  codigo_barras: string | null
+  quantidade_em_estoque: number
+  quantidade_minima: number
+  display_name: string  
 }
-
-// frontend/src/types/index.ts
 export interface Movimentacao {
-  id: number;
-  produto: number;
-  produto_nome: string;
-  quantidade: number;
-  tipo: 'entrada' | 'saida';
-  status: 'pendente' | 'aprovada' | 'recusada';
-  registrado_por_nome: string;
-  data_movimentacao: string;
+  id: number
+  produto: number
+  produto_nome: string
+  quantidade: number
+  tipo: 'entrada' | 'saida'
+  data_validade?: string | null
+  preco_unitario_doacao?: number | null
+  status: 'pendente' | 'aprovada' | 'recusada'
+  registrado_por_nome: string
+  data_movimentacao: string
 }
