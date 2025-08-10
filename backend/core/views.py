@@ -14,9 +14,10 @@ class IsControlador(permissions.BasePermission):
         return request.user.groups.filter(name='Controlador').exists()
 
 # --- ViewSets da API ---
-class DepartamentoViewSet(viewsets.ReadOnlyModelViewSet):
+class DepartamentoViewSet(viewsets.ModelViewSet):
     queryset = Departamento.objects.all()
     serializer_class = DepartamentoSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 class ProdutoViewSet(viewsets.ModelViewSet):
     queryset = Produto.objects.all()
