@@ -48,3 +48,13 @@ export interface Movimentacao {
   registrado_por_nome: string
   data_movimentacao: string
 }
+
+export interface Crianca {
+  id: number;
+  nome_completo: string;
+  data_nascimento: string; // Datas vem como string da API
+  idade: number;
+  status_acolhimento: boolean;
+  data_entrada: string;
+  data_saida: string | null;
+}
