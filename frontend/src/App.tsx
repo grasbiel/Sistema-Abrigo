@@ -13,6 +13,8 @@ import Dashboard from './pages/Dashboard';
 import EstoquePage from './pages/EstoquePage';
 import RegistrarMovimentacaoPage from './pages/RegistrarMovimentacaoPage';
 import ValidarMovimentacaoPage from './pages/ValidarMovimentacaoPage';
+import GerenciarCriancasPage from './pages/GerenciarCriancasPage';
+import CadastrarProdutoPage from './pages/CadastrarProdutoPage';
 
 function App() {
   return (
@@ -31,6 +33,8 @@ function App() {
               <Route path="/estoque" element={<EstoquePage />} />
               <Route path="/registrar-movimentacao" element={<RegistrarMovimentacaoPage />} />
               <Route path="/validar-movimentacao" element={<ValidarMovimentacaoPage />} />
+              <Route path="/cadastrar-produto" element={<CadastrarProdutoPage />} />
+              <Route path="/gerenciar-criancas" element={<GerenciarCriancasPage />} />
             </Route>
           </Route>
 
