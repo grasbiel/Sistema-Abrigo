@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Paper } from '@mui/material';
+import { Box, Typography, Paper, Button } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
+
+import {Link as RouterLink} from 'react-router-dom'
 
 import apiClient from '../api/axiosConfig';
 import { Produto } from '../types';
@@ -67,9 +69,14 @@ const EstoquePage: React.FC = () => {
 
     return (
         <Box>
-            <Typography variant="h4" gutterBottom>
+            <Box sx={{display:'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2}}>
+                <Typography variant="h4" gutterBottom>
                 Estoque de Produtos
-            </Typography>
+                </Typography>
+                <Button variant='contained' component={RouterLink} to="/cadastrar-produto">
+                    Adicionar novos produtos
+                </Button>
+            </Box>
             <Paper sx={{ height: 600, width: '100%' }}>
                 <DataGrid
                     rows={produtos}
