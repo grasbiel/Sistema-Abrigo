@@ -6,8 +6,9 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import LogoutIcon from '@mui/icons-material/Logout';
-
+import EscalatorWarningIcon from '@mui/icons-material/EscalatorWarning';
 import AuthContext from '../context/AuthContext';
+import CategoryIcon from '@mui/icons-material/Category';
 
 const drawerWidth = 240;
 
@@ -47,6 +48,20 @@ const Layout: React.FC = () => {
                         </ListItemButton>
                     </ListItem>
                 )}
+
+                <ListItem disablePadding component={RouterLink} to="/gerenciar-criancas">
+                    <ListItemButton>
+                        <ListItemIcon><EscalatorWarningIcon /></ListItemIcon>
+                        <ListItemText primary="Gerenciar Crianças" />
+                    </ListItemButton>
+                </ListItem>
+                
+                <ListItem disablePadding component={RouterLink} to="/gerenciar-departamentos">
+                    <ListItemButton>
+                        <ListItemIcon><CategoryIcon /></ListItemIcon>
+                        <ListItemText primary="Departamentos" />
+                    </ListItemButton>
+                </ListItem>
             </List>
             <Divider />
             <List>
