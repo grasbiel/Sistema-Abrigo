@@ -21,6 +21,11 @@ export interface Indicadores {
     '13+': number;
   };
 }
+//Define a forma de um objeto departamento
+export interface Departamento {
+    id: number;
+    nome: string;
+}
 
 // Define a forma de um objeto Produto
 export interface Produto {
