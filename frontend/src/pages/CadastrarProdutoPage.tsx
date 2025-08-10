@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Box, Typography, Paper, Grid, TextField, Button, Alert, CircularProgress, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Box, Typography, Paper, Grid, TextField, Button, Alert, CircularProgress, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 
 import apiClient from '../api/axiosConfig';
 
-// Supondo que você tenha um tipo para Departamento
+// Tipo para um único Departamento
 interface Departamento {
     id: number;
     nome: string;
+}
+
+// Tipo para a resposta paginada da API
+interface PaginatedDepartamentosResponse {
+    count: number;
+    results: Departamento[];
 }
 
 const CadastrarProdutoPage: React.FC = () => {
@@ -27,15 +33,25 @@ const CadastrarProdutoPage: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        apiClient.get<Departamento[]>('/departamentos/')
-            .then(res => setDepartamentos(res.data))
-            .catch(() => setError('Não foi possível carregar os departamentos.'))
-            .finally(() => setLoading(false));
+        const fetchDepartamentos = async () => {
+            setLoading(true);
+            try {
+                const response = await apiClient.get<PaginatedDepartamentosResponse>('/departamentos/?page_size=100');
+                
+                setDepartamentos(response.data.results);
+
+            } catch (err) {
+                setError('Não foi possível carregar os departamentos.');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchDepartamentos();
     }, []);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name: string; value: unknown } }) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value as string }));
+        setFormData(prev => ({ ...prev, [name!]: value as string }));
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -74,13 +90,13 @@ const CadastrarProdutoPage: React.FC = () => {
                 {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
 
                 <Grid container spacing={2}>
-                    <Grid size={{xs:12, sm: 8}}>
+                    <Grid size={{xs:12, sm:8}} >
                         <TextField name="nome" label="Nome do Produto (Ex: Leite em Pó Integral)" value={formData.nome} onChange={handleChange} fullWidth required />
                     </Grid>
-                    <Grid size={{xs:12, sm: 4}}>
+                    <Grid size={{xs:12, sm:4}}>
                         <TextField name="marca" label="Marca (Ex: Ninho)" value={formData.marca} onChange={handleChange} fullWidth />
                     </Grid>
-                    <Grid size={{xs:12, sm: 6}}>
+                    <Grid size={{xs:12, sm:6}}>
                         <FormControl fullWidth required>
                             <InputLabel id="unidade-medida-label">Unidade de Medida</InputLabel>
                             <Select name="unidade_medida" labelId="unidade-medida-label" value={formData.unidade_medida} label="Unidade de Medida" onChange={handleChange}>
@@ -95,10 +111,10 @@ const CadastrarProdutoPage: React.FC = () => {
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid size={{xs:12, sm: 6}}>
+                    <Grid size={{xs:12, sm:6}}>
                         <TextField name="tamanho" label="Tamanho/Volume (Ex: 0.4 para 400g)" type="number" value={formData.tamanho} onChange={handleChange} fullWidth />
                     </Grid>
-                     <Grid size={{xs:12, sm: 6}}>
+                     <Grid size={{xs:12, sm:6}}>
                         <FormControl fullWidth required>
                             <InputLabel id="departamento-label">Departamento</InputLabel>
                             <Select name="departamento" labelId="departamento-label" value={formData.departamento} label="Departamento" onChange={handleChange}>
@@ -108,7 +124,7 @@ const CadastrarProdutoPage: React.FC = () => {
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid size={{xs:12, sm: 6}}>
+                    <Grid size={{xs:12, sm:6}} >
                         <TextField name="quantidade_minima" label="Quantidade Mínima de Alerta" type="number" value={formData.quantidade_minima} onChange={handleChange} fullWidth required />
                     </Grid>
                     <Grid size={{xs:12}}>
