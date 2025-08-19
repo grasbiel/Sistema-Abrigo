@@ -9,6 +9,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import EscalatorWarningIcon from '@mui/icons-material/EscalatorWarning';
 import AuthContext from '../context/AuthContext';
 import CategoryIcon from '@mui/icons-material/Category';
+import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
 
 const drawerWidth = 240;
 
@@ -39,14 +40,14 @@ const Layout: React.FC = () => {
                     </ListItemButton>
                 </ListItem>
                 
-                {/* Link Condicional para o Controlador */}
+                
                 {user?.groups.includes('Controlador') && (
-                     <ListItem disablePadding component={RouterLink} to="/validar-movimentacao">
-                        <ListItemButton sx={{ backgroundColor: 'rgba(0, 0, 255, 0.08)' }}>
+                    <ListItem disablePadding component={RouterLink} to="/validar-movimentacao">
+                        <ListItemButton >
                             <ListItemIcon><PlaylistAddCheckIcon color="primary" /></ListItemIcon>
                             <ListItemText primary="Validar Movimentações" />
                         </ListItemButton>
-                    </ListItem>
+                     </ListItem>
                 )}
 
                 <ListItem disablePadding component={RouterLink} to="/gerenciar-criancas">
@@ -55,13 +56,24 @@ const Layout: React.FC = () => {
                         <ListItemText primary="Gerenciar Crianças" />
                     </ListItemButton>
                 </ListItem>
-                
-                <ListItem disablePadding component={RouterLink} to="/gerenciar-departamentos">
-                    <ListItemButton>
-                        <ListItemIcon><CategoryIcon /></ListItemIcon>
-                        <ListItemText primary="Departamentos" />
-                    </ListItemButton>
-                </ListItem>
+
+                {user?.groups.includes('Controlador') && (
+                    <ListItem disablePadding component={RouterLink} to="/gerenciar-departamentos">
+                        <ListItemButton>
+                            <ListItemIcon><CategoryIcon /></ListItemIcon>
+                            <ListItemText primary="Departamentos" />
+                        </ListItemButton>
+                    </ListItem>
+                    
+                )}
+                {user?.groups.includes('Controlador') && (
+                    <ListItem disablePadding component={RouterLink} to="/gerenciar-usuarios">
+                            <ListItemButton>
+                                <ListItemIcon><SupervisorAccountIcon /></ListItemIcon>
+                                <ListItemText primary="Gerenciar Usuários" />
+                            </ListItemButton>
+                    </ListItem>
+                )}
             </List>
             <Divider />
             <List>

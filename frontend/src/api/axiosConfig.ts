@@ -1,7 +1,5 @@
-// frontend/src/api/axiosConfig.ts
-
-import axios, { InternalAxiosRequestConfig, AxiosError } from 'axios';
-import { AuthTokens } from '../types';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { LoginResponse } from '../types';
 
 const baseURL = 'http://127.0.0.1:8000/api/';
 
@@ -9,66 +7,51 @@ const apiClient = axios.create({
   baseURL,
 });
 
-// Interceptor para adicionar o token de acesso a cada requisição
 apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
+  (config) => {
     const tokenString = localStorage.getItem('authTokens');
     if (tokenString) {
-      const tokens: AuthTokens = JSON.parse(tokenString);
-      config.headers.Authorization = `Bearer ${tokens.access}`;
+      const tokens: LoginResponse = JSON.parse(tokenString);
+      // Agora a propriedade 'accessToken' existe e o erro some
+      config.headers.Authorization = `Bearer ${tokens.accessToken}`;
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Interceptor para lidar com respostas de erro (ex: token expirado)
 apiClient.interceptors.response.use(
-  (response) => response, // Se a resposta for sucesso, apenas a retorna
+  (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    // Verifica se o erro é 401 (Não Autorizado) e se não é uma tentativa de repetição
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true; // Marca a requisição para não tentar repetir infinitamente
-
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+      originalRequest._retry = true;
+      
       const tokenString = localStorage.getItem('authTokens');
       if (tokenString) {
-        const tokens: AuthTokens = JSON.parse(tokenString);
-        const refreshToken = tokens.refresh;
-
+        const tokens: LoginResponse = JSON.parse(tokenString);
+        
         try {
-          // Tenta obter um novo token de acesso usando o refresh token
-          const response = await axios.post<{ access: string }>(`${baseURL}token/refresh/`, {
-            refresh: refreshToken,
+          const response = await axios.post<LoginResponse>(`${baseURL}auth/refresh`, {
+            refreshToken: tokens.refreshToken, // Agora a propriedade 'refreshToken' existe
           });
 
-          const newAccessToken = response.data.access;
-          const newTokens: AuthTokens = { ...tokens, access: newAccessToken };
-
-          // Atualiza o localStorage com o novo token
+          const newTokens = response.data;
           localStorage.setItem('authTokens', JSON.stringify(newTokens));
 
-          // Atualiza o cabeçalho da requisição original com o novo token
-          apiClient.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
-          originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-          
-          // Tenta novamente a requisição original que falhou
-          return apiClient(originalRequest);
+          originalRequest.headers['Authorization'] = `Bearer ${newTokens.accessToken}`; // E 'accessToken' também
 
+          return apiClient(originalRequest);
         } catch (refreshError) {
-          console.error("Refresh token inválido ou expirado.", refreshError);
-          // Se o refresh falhar, limpa tudo e redireciona para o login
           localStorage.removeItem('authTokens');
           window.location.href = '/login';
           return Promise.reject(refreshError);
         }
       }
     }
-    // Para todos os outros erros, apenas rejeita a promise
     return Promise.reject(error);
   }
 );
-
 
 export default apiClient;

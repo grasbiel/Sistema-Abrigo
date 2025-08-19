@@ -16,6 +16,7 @@ import ValidarMovimentacaoPage from './pages/ValidarMovimentacaoPage';
 import GerenciarCriancasPage from './pages/GerenciarCriancasPage';
 import CadastrarProdutoPage from './pages/CadastrarProdutoPage';
 import GerenciarDepartamentosPage from './pages/GerenciarDepartamentoPages';
+import GerenciarUsuariosPage from './pages/GereciarUsuariosPage';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
               <Route path="/cadastrar-produto" element={<CadastrarProdutoPage />} />
               <Route path="/gerenciar-criancas" element={<GerenciarCriancasPage />} />
               <Route path="/gerenciar-departamentos" element={<GerenciarDepartamentosPage />} />
+              <Route path="/gerenciar-usuarios" element={<GerenciarUsuariosPage />} />
             </Route>
           </Route>
 

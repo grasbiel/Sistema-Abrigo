@@ -63,3 +63,22 @@ export interface Crianca {
   data_entrada: string;
   data_saida: string | null;
 }
+
+export interface Grupo {
+  id: number;
+  name: string;
+}
+
+export interface Usuario {
+  id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  groups: string[];
+}
+
+export interface LoginResponse {
+  accessToken: string
+  refreshToken: string
+}

@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { Box, Typography, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 
 import apiClient from '../api/axiosConfig';
 import { Departamento } from '../types';
+import AuthContext from '../context/AuthContext';
 
 // Tipo para a resposta paginada da API de Departamentos
 interface PaginatedDepartamentosResponse {
@@ -17,6 +18,8 @@ const GerenciarDepartamentosPage: React.FC = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [novoDepartamento, setNovoDepartamento] = useState({ nome: '' });
     const [error, setError] = useState('');
+
+    const { user } = useContext(AuthContext)!
 
     // Função para buscar os departamentos (usando useCallback para otimização)
     const fetchDepartamentos = useCallback(async () => {
@@ -74,9 +77,15 @@ const GerenciarDepartamentosPage: React.FC = () => {
                 <Typography variant="h4" gutterBottom>
                     Gerenciar Departamentos
                 </Typography>
-                <Button variant="contained" startIcon={<AddIcon />} onClick={handleModalOpen}>
-                    Adicionar Departamento
-                </Button>
+                {
+                    user?.groups.includes('Controlador') && (
+                         <Button variant="contained" startIcon={<AddIcon />} onClick={handleModalOpen}>
+                            Adicionar Departamento
+                        </Button>
+                    )
+
+                }
+               
             </Box>
             <Paper sx={{ height: 400, width: '100%' }}>
                 <DataGrid rows={departamentos} columns={columns} loading={loading} />
