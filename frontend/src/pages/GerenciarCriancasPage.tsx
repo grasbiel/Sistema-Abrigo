@@ -118,7 +118,7 @@ const GerenciarCriancasPage: React.FC = () => {
                     Gerenciar Crianças
                 </Typography>
                 {/* Botão de cadastrar só aparece para o Controlador */}
-                {user?.groups.includes('Controlador') && (
+                {user?.groups.includes('ROLE_CONTROLADOR') && (
                     <Button variant="contained" startIcon={<AddIcon />} onClick={handleModalOpen}>
                         Cadastrar Criança
                     </Button>

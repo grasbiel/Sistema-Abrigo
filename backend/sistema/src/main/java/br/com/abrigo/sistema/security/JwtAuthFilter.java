@@ -1,3 +1,5 @@
+// backend/sistema/src/main/java/br/com/abrigo/sistema/security/JwtAuthFilter.java
+
 package br.com.abrigo.sistema.security;
 
 import br.com.abrigo.sistema.service.CustomUserDetailsService;
@@ -5,6 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,7 +30,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-            // 2. AGORA ESTA ANOTAÇÃO É A CORRETA QUE O SPRING ESPERA
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain)
@@ -40,20 +42,24 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
-        }
+    }
 
         jwtToken = authHeader.substring(7);
         username = jwtUtil.extractUsername(jwtToken);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-            if (jwtUtil.isTokenValid(jwtToken, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                if (jwtUtil.isTokenValid(jwtToken, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
+
+                
+                System.out.println("Autoridades no token: " + userDetails.getAuthorities());
+
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
         filterChain.doFilter(request, response);
-    }
+   }
 }

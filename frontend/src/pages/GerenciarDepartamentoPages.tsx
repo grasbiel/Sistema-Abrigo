@@ -78,7 +78,7 @@ const GerenciarDepartamentosPage: React.FC = () => {
                     Gerenciar Departamentos
                 </Typography>
                 {
-                    user?.groups.includes('Controlador') && (
+                    user?.groups.includes('ROLE_CONTROLADOR') && (
                          <Button variant="contained" startIcon={<AddIcon />} onClick={handleModalOpen}>
                             Adicionar Departamento
                         </Button>

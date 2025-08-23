@@ -37,12 +37,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // Desabilita o CSRF
-            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Habilita e configura o CORS
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Define a sessão como sem estado
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/h2-console/**").permitAll() // Libera o login e o console H2
-                .anyRequest().authenticated() // Protege todo o resto
+                .requestMatchers("/api/auth/**", "/h2-console/**").permitAll()
+                .anyRequest().authenticated()
             )
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

@@ -41,7 +41,7 @@ const Layout: React.FC = () => {
                 </ListItem>
                 
                 
-                {user?.groups.includes('Controlador') && (
+                {user?.groups.includes('ROLE_CONTROLADOR') && (
                     <ListItem disablePadding component={RouterLink} to="/validar-movimentacao">
                         <ListItemButton >
                             <ListItemIcon><PlaylistAddCheckIcon color="primary" /></ListItemIcon>
@@ -57,7 +57,7 @@ const Layout: React.FC = () => {
                     </ListItemButton>
                 </ListItem>
 
-                {user?.groups.includes('Controlador') && (
+                {user?.groups.includes('ROLE_CONTROLADOR') && (
                     <ListItem disablePadding component={RouterLink} to="/gerenciar-departamentos">
                         <ListItemButton>
                             <ListItemIcon><CategoryIcon /></ListItemIcon>
@@ -66,7 +66,7 @@ const Layout: React.FC = () => {
                     </ListItem>
                     
                 )}
-                {user?.groups.includes('Controlador') && (
+                {user?.groups.includes('ROLE_CONTROLADOR') && (
                     <ListItem disablePadding component={RouterLink} to="/gerenciar-usuarios">
                             <ListItemButton>
                                 <ListItemIcon><SupervisorAccountIcon /></ListItemIcon>

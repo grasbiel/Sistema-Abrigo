@@ -91,7 +91,7 @@ const GerenciarUsuariosPage: React.FC = () => {
         { field: 'last_name', headerName: 'Sobrenome', width: 150 },
         { field: 'email', headerName: 'Email', flex: 1 },
         { field: 'groups', headerName: 'Cargo', width: 200, renderCell: (params) => (
-            <Box>{(params.value as string[]).map((group: string) => <Chip key={group} label={group} size="small" color={group === 'Controlador' ? 'primary' : 'default'} />)}</Box>
+            <Box>{(params.value as string[]).map((group: string) => <Chip key={group} label={group} size="small" color={group === 'ROLE_CONTROLADOR' ? 'primary' : 'default'} />)}</Box>
         )},
     ];
 
@@ -99,7 +99,7 @@ const GerenciarUsuariosPage: React.FC = () => {
         <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="h4" gutterBottom>Gerenciar Usuários</Typography>
-                {user?.groups.includes('Controlador') && (
+                {user?.groups.includes('ROLE_CONTROLADOR') && (
                     <Button variant="contained" startIcon={<AddIcon />} onClick={handleModalOpen}>Novo Usuário</Button>
                 )}
             </Box>

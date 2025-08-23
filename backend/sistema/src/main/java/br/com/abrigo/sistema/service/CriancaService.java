@@ -21,7 +21,7 @@ public class CriancaService {
         crianca.setNomeCompleto(request.nome_completo());
         crianca.setDataNascimento(request.data_nascimento());
         crianca.setDataEntrada(request.data_entrada());
-        crianca.setStatusAcolhimento(true); // Sempre entra como ativa
+        crianca.setStatusAcolhimento(true); // Toda nova criança entra como ativa
 
         Crianca savedCrianca = criancaRepository.save(crianca);
         return mapEntityToResponse(savedCrianca);
@@ -38,7 +38,7 @@ public class CriancaService {
             entity.getId(),
             entity.getNomeCompleto(),
             entity.getDataNascimento(),
-            entity.getIdade(), // O método getIdade() é chamado aqui
+            entity.getIdade(), // O método da entidade é chamado aqui
             entity.isStatusAcolhimento(),
             entity.getDataEntrada(),
             entity.getDataSaida()

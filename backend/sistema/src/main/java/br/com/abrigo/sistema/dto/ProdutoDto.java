@@ -1,14 +1,14 @@
 package br.com.abrigo.sistema.dto;
 
-import java.math.BigDecimal;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
+import java.math.BigDecimal;
 
 public class ProdutoDto {
-    // Criação e atualização de um produto
-    public record ProdutoRequest (
+
+    // DTO para requisições de criação/atualização de um produto
+    public record ProdutoRequest(
         @NotBlank String nome,
         String marca,
         @NotBlank String unidade_medida,
@@ -17,11 +17,10 @@ public class ProdutoDto {
         String descricao_adicional,
         String codigo_barras,
         @NotNull @PositiveOrZero BigDecimal quantidade_minima
-
     ) {}
 
-    // DTO para respostas, mostrando os dados completos do produto
-    public record ProdutoResponse (
+    // DTO para respostas, mostrando os dados formatados do produto
+    public record ProdutoResponse(
         Long id,
         String nome,
         String marca,
