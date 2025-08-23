@@ -6,10 +6,13 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import LogoutIcon from '@mui/icons-material/Logout';
-import EscalatorWarningIcon from '@mui/icons-material/EscalatorWarning';
+
 import AuthContext from '../context/AuthContext';
+<<<<<<< HEAD
 import CategoryIcon from '@mui/icons-material/Category';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
+=======
+>>>>>>> parent of 3cb17c8 (Add management children and departament)
 
 const drawerWidth = 240;
 
@@ -49,6 +52,7 @@ const Layout: React.FC = () => {
                         </ListItemButton>
                      </ListItem>
                 )}
+<<<<<<< HEAD
 
                 <ListItem disablePadding component={RouterLink} to="/gerenciar-criancas">
                     <ListItemButton>
@@ -74,6 +78,8 @@ const Layout: React.FC = () => {
                             </ListItemButton>
                     </ListItem>
                 )}
+=======
+>>>>>>> parent of 3cb17c8 (Add management children and departament)
             </List>
             <Divider />
             <List>
