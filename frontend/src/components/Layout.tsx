@@ -10,9 +10,12 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import AuthContext from '../context/AuthContext';
 <<<<<<< HEAD
 import CategoryIcon from '@mui/icons-material/Category';
+<<<<<<< HEAD
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
 =======
 >>>>>>> parent of 3cb17c8 (Add management children and departament)
+=======
+>>>>>>> parent of 2afa89a (Mudando o backend de django para spring boot)
 
 const drawerWidth = 240;
 
@@ -43,14 +46,21 @@ const Layout: React.FC = () => {
                     </ListItemButton>
                 </ListItem>
                 
+<<<<<<< HEAD
                 
                 {user?.groups.includes('ROLE_CONTROLADOR') && (
                     <ListItem disablePadding component={RouterLink} to="/validar-movimentacao">
                         <ListItemButton >
+=======
+                {/* Link Condicional para o Controlador */}
+                {user?.groups.includes('Controlador') && (
+                     <ListItem disablePadding component={RouterLink} to="/validar-movimentacao">
+                        <ListItemButton sx={{ backgroundColor: 'rgba(0, 0, 255, 0.08)' }}>
+>>>>>>> parent of 2afa89a (Mudando o backend de django para spring boot)
                             <ListItemIcon><PlaylistAddCheckIcon color="primary" /></ListItemIcon>
                             <ListItemText primary="Validar Movimentações" />
                         </ListItemButton>
-                     </ListItem>
+                    </ListItem>
                 )}
 <<<<<<< HEAD
 
@@ -60,6 +70,7 @@ const Layout: React.FC = () => {
                         <ListItemText primary="Gerenciar Crianças" />
                     </ListItemButton>
                 </ListItem>
+<<<<<<< HEAD
 
                 {user?.groups.includes('ROLE_CONTROLADOR') && (
                     <ListItem disablePadding component={RouterLink} to="/gerenciar-departamentos">
@@ -80,6 +91,15 @@ const Layout: React.FC = () => {
                 )}
 =======
 >>>>>>> parent of 3cb17c8 (Add management children and departament)
+=======
+                
+                <ListItem disablePadding component={RouterLink} to="/gerenciar-departamentos">
+                    <ListItemButton>
+                        <ListItemIcon><CategoryIcon /></ListItemIcon>
+                        <ListItemText primary="Departamentos" />
+                    </ListItemButton>
+                </ListItem>
+>>>>>>> parent of 2afa89a (Mudando o backend de django para spring boot)
             </List>
             <Divider />
             <List>

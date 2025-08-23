@@ -1,131 +1,77 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Box, Typography, Paper, Chip, Alert } from '@mui/material';
-import { DataGrid, GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
-import { format, parseISO } from 'date-fns';
-
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import apiClient from '../api/axiosConfig';
 import { Movimentacao } from '../types';
-
-// Interface para a resposta paginada
-interface PaginatedMovimentacoesResponse {
-    count: number;
-    results: Movimentacao[];
-}
 
 const ValidarMovimentacaoPage: React.FC = () => {
     const [pendentes, setPendentes] = useState<Movimentacao[]>([]);
     const [loading, setLoading] = useState(true);
-    const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+    const [message, setMessage] = useState('');
 
-    const fetchPendentes = useCallback(async () => {
+    const fetchPendentes = () => {
         setLoading(true);
-        try {
-            // A rota de movimentações também é paginada
-            const response = await apiClient.get<PaginatedMovimentacoesResponse>('/movimentacoes/?status=pendente');
-            setPendentes(response.data.results);
-        } catch (err) {
-            console.error("Erro ao buscar movimentações pendentes:", err);
-            setFeedback({ type: 'error', message: 'Não foi possível carregar as movimentações.' });
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+        apiClient.get<Movimentacao[]>('/movimentacoes/?status=pendente')
+            .then(res => {
+                setPendentes(res.data);
+                setLoading(false);
+            })
+            .catch(() => setLoading(false));
+    };
 
     useEffect(() => {
         fetchPendentes();
-    }, [fetchPendentes]);
+    }, []);
 
-    const handleAprovar = useCallback(async (id: number) => {
-        setFeedback(null);
+    const handleAprovar = async (id: number) => {
+        setMessage('');
         try {
             await apiClient.post(`/movimentacoes/${id}/validar/`);
-            setFeedback({ type: 'success', message: 'Movimentação aprovada com sucesso!' });
+            setMessage('Movimentação aprovada com sucesso!');
             fetchPendentes(); // Re-busca a lista para remover o item aprovado
         } catch (err) {
-            setFeedback({ type: 'error', message: 'Erro ao aprovar a movimentação.' });
+            setMessage('Erro ao aprovar a movimentação.');
         }
-    }, [fetchPendentes]);
+    };
 
-    const handleRecusar = useCallback(async (id: number) => {
-        setFeedback(null);
-        try {
-            // Um PATCH é usado para atualizações parciais
-            await apiClient.patch(`/movimentacoes/${id}/`, { status: 'recusada' });
-            setFeedback({ type: 'success', message: 'Movimentação recusada.' });
-            fetchPendentes(); // Re-busca a lista
-        } catch (err) {
-            setFeedback({ type: 'error', message: 'Erro ao recusar a movimentação.' });
-        }
-    }, [fetchPendentes]);
-
-    const columns: GridColDef[] = [
-        { field: 'produto_nome', headerName: 'Produto', flex: 1.5 },
-        {
-            field: 'tipo',
-            headerName: 'Tipo',
-            width: 120,
-            renderCell: (params) => (
-                <Chip 
-                    label={params.value === 'entrada' ? 'Entrada' : 'Saída'}
-                    color={params.value === 'entrada' ? 'success' : 'warning'}
-                    size="small"
-                />
-            ),
-        },
-        { field: 'quantidade', headerName: 'Qtd', type: 'number', width: 80, align: 'center', headerAlign: 'center' },
-        { field: 'registrado_por_nome', headerName: 'Registrado por', width: 150 },
-        {
-            field: 'data_movimentacao',
-            headerName: 'Data',
-            width: 160,
-            renderCell: (params) => format(parseISO(params.value), 'dd/MM/yyyy HH:mm')
-        },
-        {
-            field: 'actions',
-            type: 'actions',
-            headerName: 'Ações',
-            width: 100,
-            getActions: (params) => [
-                <GridActionsCellItem
-                    icon={<CheckCircleIcon color="success" />}
-                    label="Aprovar"
-                    onClick={() => handleAprovar(params.id as number)}
-                />,
-                <GridActionsCellItem
-                    icon={<CancelIcon color="error" />}
-                    label="Recusar"
-                    onClick={() => handleRecusar(params.id as number)}
-                />,
-            ],
-        },
-    ];
+    if (loading) return <p>Carregando movimentações pendentes...</p>;
 
     return (
-        <Box>
-            <Typography variant="h4" gutterBottom>
-                Validar Movimentações Pendentes
-            </Typography>
+        <div>
+            <h1>Validar Movimentações Pendentes</h1>
+            <Link to="/dashboard">Voltar para o Dashboard</Link>
 
-            {feedback && <Alert severity={feedback.type} sx={{ mb: 2 }}>{feedback.message}</Alert>}
-            
-            <Paper sx={{ height: 600, width: '100%' }}>
-                <DataGrid
-                    rows={pendentes}
-                    columns={columns}
-                    loading={loading}
-                    // O Data Grid exibe uma mensagem customizada se não houver linhas
-                    slots={{
-                      noRowsOverlay: () => (
-                        <Box sx={{ mt: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%'}}>
-                          Nenhuma movimentação pendente.
-                        </Box>
-                      )
-                    }}
-                />
-            </Paper>
-        </Box>
+            {message && <p>{message}</p>}
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Tipo</th>
+                        <th>Qtd</th>
+                        <th>Registrado por</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {pendentes.length > 0 ? pendentes.map(mov => (
+                        <tr key={mov.id}>
+                            <td>{mov.produto_nome}</td>
+                            <td>{mov.tipo}</td>
+                            <td>{mov.quantidade}</td>
+                            <td>{mov.registrado_por_nome}</td>
+                            <td>
+                                <button onClick={() => handleAprovar(mov.id)}>Aprovar</button>
+                                {/* Botão de recusar pode ser implementado no futuro */}
+                            </td>
+                        </tr>
+                    )) : (
+                        <tr>
+                            <td colSpan={5}>Nenhuma movimentação pendente.</td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
+        </div>
     );
 };
 

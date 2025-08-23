@@ -2,11 +2,11 @@ import React, { createContext, useState, ReactNode } from 'react';
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/axiosConfig';
-import { User, LoginResponse } from '../types';
+import { User, AuthTokens } from '../types'; // Importando nossos tipos
 
+// Definindo o tipo para o valor do nosso contexto
 interface AuthContextType {
   user: User | null;
-  authTokens: LoginResponse | null;
   loginUser: (username: string, password: string) => Promise<void>;
   logoutUser: () => void;
 }
@@ -15,42 +15,23 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export default AuthContext;
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [authTokens, setAuthTokens] = useState<LoginResponse | null>(() => {
-        const tokenString = localStorage.getItem('authTokens');
-        return tokenString ? JSON.parse(tokenString) : null;
-    });
-
-    const [user, setUser] = useState<User | null>(() => {
-        const tokenString = localStorage.getItem('authTokens');
-        if (tokenString) {
-            try {
-                // CORREÇÃO AQUI: Verificamos se accessToken existe antes de decodificar
-                const tokens: LoginResponse = JSON.parse(tokenString);
-                if (tokens.accessToken) {
-                    return jwtDecode(tokens.accessToken);
-                }
-            } catch (error) {
-                console.error("Falha ao decodificar o token do localStorage", error);
-                return null;
-            }
-        }
-        return null;
-    });
-
+    const [authTokens, setAuthTokens] = useState<AuthTokens | null>(() => 
+        localStorage.getItem('authTokens') ? JSON.parse(localStorage.getItem('authTokens')!) : null
+    );
+    const [user, setUser] = useState<User | null>(() => 
+        localStorage.getItem('authTokens') ? jwtDecode(JSON.parse(localStorage.getItem('authTokens')!).access) : null
+    );
     const navigate = useNavigate();
 
     const loginUser = async (username: string, password: string) => {
         try {
-            const response = await apiClient.post<LoginResponse>('/auth/login', { username, password });
-            
+            const response = await apiClient.post<AuthTokens>('/token/', { username, password });
             if (response.status === 200) {
                 const data = response.data;
                 setAuthTokens(data);
-                if (data.accessToken) {
-                    setUser(jwtDecode(data.accessToken));
-                    localStorage.setItem('authTokens', JSON.stringify(data));
-                    navigate('/dashboard');
-                }
+                setUser(jwtDecode(data.access));
+                localStorage.setItem('authTokens', JSON.stringify(data));
+                navigate('/dashboard');
             }
         } catch (error) {
             console.error("Erro no login!", error);
@@ -67,7 +48,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const contextData: AuthContextType = {
         user,
-        authTokens,
         loginUser,
         logoutUser,
     };

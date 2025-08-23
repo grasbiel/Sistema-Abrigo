@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Box, Typography, Paper, Grid, TextField, Button, Alert, CircularProgress, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from '@mui/material';
-import apiClient from '../api/axiosConfig';
-import { AxiosError } from 'axios';
 
+import apiClient from '../api/axiosConfig';
+
+// Tipo para um único Departamento
 interface Departamento {
     id: number;
     nome: string;
+}
+
+// Tipo para a resposta paginada da API
+interface PaginatedDepartamentosResponse {
+    count: number;
+    results: Departamento[];
 }
 
 const CadastrarProdutoPage: React.FC = () => {
@@ -17,7 +24,7 @@ const CadastrarProdutoPage: React.FC = () => {
         unidade_medida: 'un',
         tamanho: '',
         departamento: '',
-        quantidade_minima: '5.0',
+        quantidade_minima: '5.00',
         descricao_adicional: '',
     });
     const [loading, setLoading] = useState(true);
@@ -26,10 +33,20 @@ const CadastrarProdutoPage: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        apiClient.get<{ results: Departamento[] }>('/departamentos/?page_size=100')
-            .then(res => setDepartamentos(res.data.results))
-            .catch(() => setError('Não foi possível carregar os departamentos.'))
-            .finally(() => setLoading(false));
+        const fetchDepartamentos = async () => {
+            setLoading(true);
+            try {
+                const response = await apiClient.get<PaginatedDepartamentosResponse>('/departamentos/?page_size=100');
+                
+                setDepartamentos(response.data.results);
+
+            } catch (err) {
+                setError('Não foi possível carregar os departamentos.');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchDepartamentos();
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
@@ -42,28 +59,22 @@ const CadastrarProdutoPage: React.FC = () => {
         setError('');
         setSuccess('');
 
-        if (!formData.nome || !formData.departamento) {
-            setError('Nome e Departamento são obrigatórios.');
+        if (!formData.nome || !formData.departamento || !formData.unidade_medida) {
+            setError('Nome, Departamento e Unidade de Medida são obrigatórios.');
             return;
         }
 
-        // Prepara os dados para enviar, convertendo para os tipos corretos
-        const payload = {
-            ...formData,
-            tamanho: formData.tamanho ? parseFloat(formData.tamanho) : null,
-            quantidade_minima: parseFloat(formData.quantidade_minima),
-            departamento: parseInt(formData.departamento),
-        };
-
         try {
-            await apiClient.post('/produtos/', payload);
+            await apiClient.post('/produtos/', {
+                ...formData,
+                tamanho: formData.tamanho ? parseFloat(formData.tamanho) : null,
+                quantidade_minima: parseFloat(formData.quantidade_minima),
+                departamento: parseInt(formData.departamento),
+            });
             setSuccess(`Produto "${formData.nome}" cadastrado com sucesso!`);
             setTimeout(() => navigate('/estoque'), 2000);
         } catch (err) {
-            const axiosError = err as AxiosError<any>;
-            // Pega a mensagem de erro específica do backend, se houver
-            const errorMessage = axiosError.response?.data ? JSON.stringify(axiosError.response.data) : 'Falha ao cadastrar. Verifique os dados e tente novamente.';
-            setError(errorMessage);
+            setError('Falha ao cadastrar o produto. Verifique os dados e tente novamente.');
         }
     };
 
@@ -75,12 +86,11 @@ const CadastrarProdutoPage: React.FC = () => {
             <Link to="/estoque">Voltar para a Lista de Estoque</Link>
 
             <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-                {error && <Alert severity="error" sx={{ mb: 2, wordBreak: 'break-word' }}>Erro: {error}</Alert>}
+                {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
                 {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
 
-                {/* O resto do formulário continua igual ao código anterior... */}
                 <Grid container spacing={2}>
-                    <Grid size={{xs:12, sm:8}}>
+                    <Grid size={{xs:12, sm:8}} >
                         <TextField name="nome" label="Nome do Produto (Ex: Leite em Pó Integral)" value={formData.nome} onChange={handleChange} fullWidth required />
                     </Grid>
                     <Grid size={{xs:12, sm:4}}>
@@ -114,7 +124,7 @@ const CadastrarProdutoPage: React.FC = () => {
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid size={{xs:12, sm:6}}>
+                    <Grid size={{xs:12, sm:6}} >
                         <TextField name="quantidade_minima" label="Quantidade Mínima de Alerta" type="number" value={formData.quantidade_minima} onChange={handleChange} fullWidth required />
                     </Grid>
                     <Grid size={{xs:12}}>
