@@ -36,8 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const loginUser = async (username: string, password: string) => {
         try {
-            // --- CORREÇÃO DA URL AQUI ---
-            // A rota de login do Django com simple-jwt é /token/
+            
             const response = await apiClient.post<AuthTokens>('/token/', { username, password });
             
             if (response.status === 200) {

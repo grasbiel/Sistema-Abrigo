@@ -13,7 +13,7 @@ apiClient.interceptors.request.use(
     const tokenString = localStorage.getItem('authTokens');
     if (tokenString) {
       const tokens: AuthTokens = JSON.parse(tokenString);
-      // CORREÇÃO: Usa a propriedade 'access'
+      
       config.headers.Authorization = `Bearer ${tokens.access}`;
     }
     return config;
@@ -21,7 +21,7 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Interceptor para LIDAR com respostas de erro (ex: token expirado)
+
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {

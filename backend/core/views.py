@@ -4,8 +4,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth.models import Group
-from django.db import models  # <-- 1. IMPORT FALTANTE ADICIONADO
-from datetime import date     # <-- 2. IMPORT FALTANTE ADICIONADO
+from django.db import models  
+from datetime import date     
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 
 from .models import Usuario, Departamento, Produto, Crianca, Movimentacao, Notificacao
 from .serializers import (
@@ -24,27 +25,27 @@ class IsControlador(permissions.BasePermission):
 class UsuarioViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Usuario.objects.all().order_by('username')
     serializer_class = UsuarioSerializer
-    permission_classes = [IsControlador]
+    permission_classes = [IsAuthenticated]
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 class DepartamentoViewSet(viewsets.ModelViewSet):
     queryset = Departamento.objects.all().order_by('nome')
     serializer_class = DepartamentoSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 class ProdutoViewSet(viewsets.ModelViewSet):
     queryset = Produto.objects.all().order_by('nome')
     serializer_class = ProdutoSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 class CriancaViewSet(viewsets.ModelViewSet):
     queryset = Crianca.objects.all().order_by('nome_completo')
     serializer_class = CriancaSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 class MovimentacaoViewSet(viewsets.ModelViewSet):
     """
@@ -52,7 +53,7 @@ class MovimentacaoViewSet(viewsets.ModelViewSet):
     """
     queryset = Movimentacao.objects.all().order_by('-data_movimentacao')
     serializer_class = MovimentacaoSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         """Associa o usuário logado ao criar uma nova movimentação."""
