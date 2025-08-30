@@ -1,13 +1,5 @@
 from django.contrib import admin
-
-# Register your models here.
-# core/admin.py
-
-from django.contrib import admin
 from .models import Usuario, Departamento, Produto, Crianca, Movimentacao, Notificacao
-
-# Para melhorar a visualização no Admin, podemos customizar como cada modelo é exibido.
-# Esta é uma boa prática.
 
 @admin.register(Usuario)
 class UsuarioAdmin(admin.ModelAdmin):
@@ -20,8 +12,9 @@ class DepartamentoAdmin(admin.ModelAdmin):
 
 @admin.register(Produto)
 class ProdutoAdmin(admin.ModelAdmin):
+    # Usa a função __str__ para uma exibição amigável e mostra os novos campos
     list_display = ('__str__', 'departamento', 'quantidade_em_estoque', 'quantidade_minima')
-    list_filter = ('departamento',)
+    list_filter = ('departamento', 'marca')
     search_fields = ('nome', 'marca', 'codigo_barras')
 
 @admin.register(Crianca)
@@ -31,10 +24,11 @@ class CriancaAdmin(admin.ModelAdmin):
 
 @admin.register(Movimentacao)
 class MovimentacaoAdmin(admin.ModelAdmin):
-    list_display = ('produto', 'tipo', 'quantidade', 'status', 'data_validade', 'registrado_por')
+    # Adiciona os novos campos da movimentação à lista
+    list_display = ('produto', 'tipo', 'quantidade', 'status', 'data_validade', 'registrado_por', 'data_movimentacao')
     list_filter = ('status', 'tipo', 'produto__departamento')
     search_fields = ('produto__nome', 'produto__marca')
-
+    list_per_page = 25
 
 @admin.register(Notificacao)
 class NotificacaoAdmin(admin.ModelAdmin):

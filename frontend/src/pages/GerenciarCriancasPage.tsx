@@ -1,10 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react'; // 1. Adicione useContext
 import { Box, Typography, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Grid } from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid'; // Importe GridPaginationModel
 import AddIcon from '@mui/icons-material/Add';
 
 import apiClient from '../api/axiosConfig';
-import { Crianca } from '../types'; // Certifique-se que o tipo Crianca está completo em types/index.ts
+import { Crianca } from '../types';
+import AuthContext from '../context/AuthContext'; 
+
+interface PaginatedCriancasResponse {
+    count: number;
+    results: Crianca[];
+}
 
 const GerenciarCriancasPage: React.FC = () => {
     const [criancas, setCriancas] = useState<Crianca[]>([]);
@@ -12,17 +18,30 @@ const GerenciarCriancasPage: React.FC = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [formData, setFormData] = useState({ nome_completo: '', data_nascimento: '', data_entrada: new Date().toISOString().split('T')[0] });
 
+    // Estados para paginação
+    const [rowCount, setRowCount] = useState(0);
+    const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+        page: 0,
+        pageSize: 10,
+    });
+    
+    // 3. Obtenha os dados do usuário a partir do contexto
+    const { user } = useContext(AuthContext)!;
+
     const fetchCriancas = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await apiClient.get<Crianca[]>('/criancas/');
-            setCriancas(response.data);
+            const response = await apiClient.get<PaginatedCriancasResponse>(
+                `/criancas/?page=${paginationModel.page + 1}&page_size=${paginationModel.pageSize}`
+            );
+            setCriancas(response.data.results);
+            setRowCount(response.data.count);
         } catch (error) {
             console.error("Erro ao buscar crianças:", error);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [paginationModel]);
 
     useEffect(() => {
         fetchCriancas();
@@ -40,10 +59,9 @@ const GerenciarCriancasPage: React.FC = () => {
         try {
             await apiClient.post('/criancas/', formData);
             handleModalClose();
-            fetchCriancas(); // Atualiza a lista após o cadastro
+            fetchCriancas();
         } catch (error) {
             console.error("Erro ao cadastrar criança:", error);
-            // Aqui você pode adicionar um estado de erro para exibir no modal
         }
     };
 
@@ -51,31 +69,35 @@ const GerenciarCriancasPage: React.FC = () => {
         { field: 'nome_completo', headerName: 'Nome Completo', width: 300 },
         { field: 'idade', headerName: 'Idade', type: 'number', width: 100 },
         { field: 'data_entrada', headerName: 'Data de Entrada', width: 150 },
-        { field: 'status_acolhimento', headerName: 'Status', type: 'boolean', width: 120 },
+        { field: 'status_acolhimento', headerName: 'Status Ativo', type: 'boolean', width: 120 },
     ];
 
     return (
         <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-<<<<<<< HEAD
                 <Typography variant="h4" gutterBottom>
                     Gerenciar Crianças
                 </Typography>
-                {/* Botão de cadastrar só aparece para o Controlador */}
+                
+                {/* 4. A lógica condicional agora funciona porque a variável 'user' existe */}
                 {user?.groups.includes('ROLE_CONTROLADOR') && (
                     <Button variant="contained" startIcon={<AddIcon />} onClick={handleModalOpen}>
                         Cadastrar Criança
                     </Button>
                 )}
-=======
-                <Typography variant="h4" gutterBottom>Gerenciar Crianças</Typography>
-                <Button variant="contained" startIcon={<AddIcon />} onClick={handleModalOpen}>
-                    Cadastrar Criança
-                </Button>
->>>>>>> parent of 2afa89a (Mudando o backend de django para spring boot)
             </Box>
             <Paper sx={{ height: 600, width: '100%' }}>
-                <DataGrid rows={criancas} columns={columns} loading={loading} getRowId={(row) => row.id} />
+                <DataGrid 
+                    rows={criancas} 
+                    columns={columns} 
+                    loading={loading} 
+                    getRowId={(row) => row.id}
+                    rowCount={rowCount}
+                    pageSizeOptions={[5, 10, 20]}
+                    paginationModel={paginationModel}
+                    onPaginationModelChange={setPaginationModel}
+                    paginationMode="server"
+                />
             </Paper>
 
             {/* Modal de Cadastro */}
@@ -83,6 +105,7 @@ const GerenciarCriancasPage: React.FC = () => {
                 <DialogTitle>Cadastrar Nova Criança</DialogTitle>
                 <Box component="form" onSubmit={handleSubmit}>
                     <DialogContent>
+                        {/* 5. Corrigido 'size' para 'item' e adicionado 'xs' e 'sm' */}
                         <Grid container spacing={2} sx={{pt: 1}}>
                             <Grid size={{xs:12}}>
                                 <TextField name="nome_completo" label="Nome Completo" onChange={handleChange} fullWidth required autoFocus />
@@ -90,7 +113,7 @@ const GerenciarCriancasPage: React.FC = () => {
                             <Grid size={{xs:12, sm:6}}>
                                 <TextField name="data_nascimento" label="Data de Nascimento" type="date" onChange={handleChange} fullWidth required InputLabelProps={{ shrink: true }} />
                             </Grid>
-                             <Grid size={{xs:12, sm:6}}>
+                            <Grid  size={{xs:12, sm:6}}>
                                 <TextField name="data_entrada" label="Data de Entrada" type="date" value={formData.data_entrada} onChange={handleChange} fullWidth required InputLabelProps={{ shrink: true }} />
                             </Grid>
                         </Grid>

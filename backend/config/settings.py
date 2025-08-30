@@ -141,6 +141,7 @@ REST_FRAMEWORK = {
     # Define o JWT como o método padrão de autenticação para todas as rotas da API
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ],
     # Opcional, mas boa prática: Define que todas as rotas são protegidas por padrão
     'DEFAULT_PERMISSION_CLASSES': [

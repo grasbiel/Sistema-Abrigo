@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: br.com.abrigo.sistema.SistemaApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 12.99 s -- in br.com.abrigo.sistema.SistemaApplicationTests

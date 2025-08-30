@@ -1,18 +1,26 @@
-# backend/config/urls.py
+"""
+URL configuration for config project.
 
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/5.0/topics/http/urls/
+"""
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenRefreshView
+
+# Importa a nossa view customizada para obter o token
 from core.views import MyTokenObtainPairView
 
 urlpatterns = [
-    # 1. Rota para a interface de administração do Django
+    # Rota para o painel de administração padrão do Django
     path('admin/', admin.site.urls),
-    
-    # 2. Rota que delega tudo que começa com 'api/' para o arquivo urls.py da app 'core'
+
+    # Rota principal da API:
+    # Delega qualquer URL que comece com "api/" para ser gerenciada
+    # pelo arquivo "urls.py" da nossa aplicação "core".
     path('api/', include('core.urls')),
-    
-    # 3. Rotas para autenticação com Token JWT
+
+    # Rotas específicas para autenticação JWT
     path('api/token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

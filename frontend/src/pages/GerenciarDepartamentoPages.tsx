@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react'; // 1. Adicione useContext
 import { Box, Typography, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 
 import apiClient from '../api/axiosConfig';
 import { Departamento } from '../types';
+import AuthContext from '../context/AuthContext'; // 2. Importe o AuthContext
 
 // Tipo para a resposta paginada da API de Departamentos
 interface PaginatedDepartamentosResponse {
@@ -18,7 +19,9 @@ const GerenciarDepartamentosPage: React.FC = () => {
     const [novoDepartamento, setNovoDepartamento] = useState({ nome: '' });
     const [error, setError] = useState('');
 
-    // Função para buscar os departamentos (usando useCallback para otimização)
+    // 3. Obtenha os dados do usuário a partir do contexto
+    const { user } = useContext(AuthContext)!;
+
     const fetchDepartamentos = useCallback(async () => {
         setLoading(true);
         try {
@@ -32,13 +35,12 @@ const GerenciarDepartamentosPage: React.FC = () => {
         }
     }, []);
 
-    // Busca os dados quando o componente é montado
     useEffect(() => {
         fetchDepartamentos();
     }, [fetchDepartamentos]);
 
     const handleModalOpen = () => {
-        setNovoDepartamento({ nome: '' }); // Reseta o formulário
+        setNovoDepartamento({ nome: '' });
         setError('');
         setModalOpen(true);
     };
@@ -55,7 +57,7 @@ const GerenciarDepartamentosPage: React.FC = () => {
         try {
             await apiClient.post('/departamentos/', novoDepartamento);
             handleModalClose();
-            fetchDepartamentos(); // Atualiza a lista na tela após o cadastro
+            fetchDepartamentos();
         } catch (err) {
             console.error("Erro ao cadastrar departamento:", err);
             setError('Falha ao cadastrar. Este departamento já pode existir.');
@@ -65,7 +67,6 @@ const GerenciarDepartamentosPage: React.FC = () => {
     const columns: GridColDef[] = [
         { field: 'id', headerName: 'ID', width: 90 },
         { field: 'nome', headerName: 'Nome do Departamento', flex: 1 },
-        // Podemos adicionar uma coluna de 'Ações' (editar/excluir) no futuro
     ];
 
     return (
@@ -74,27 +75,19 @@ const GerenciarDepartamentosPage: React.FC = () => {
                 <Typography variant="h4" gutterBottom>
                     Gerenciar Departamentos
                 </Typography>
-<<<<<<< HEAD
-                {
-                    user?.groups.includes('ROLE_CONTROLADOR') && (
-                         <Button variant="contained" startIcon={<AddIcon />} onClick={handleModalOpen}>
-                            Adicionar Departamento
-                        </Button>
-                    )
-
-                }
-               
-=======
-                <Button variant="contained" startIcon={<AddIcon />} onClick={handleModalOpen}>
-                    Adicionar Departamento
-                </Button>
->>>>>>> parent of 2afa89a (Mudando o backend de django para spring boot)
+                
+                {/* 4. A lógica condicional agora funciona e não está duplicada */}
+                {user?.groups.includes('Controlador') && (
+                    <Button variant="contained" startIcon={<AddIcon />} onClick={handleModalOpen}>
+                        Adicionar Departamento
+                    </Button>
+                )}
             </Box>
             <Paper sx={{ height: 400, width: '100%' }}>
                 <DataGrid rows={departamentos} columns={columns} loading={loading} />
             </Paper>
 
-            {/* Modal de Cadastro de Novo Departamento */}
+            {/* Modal de Cadastro */}
             <Dialog open={modalOpen} onClose={handleModalClose} fullWidth maxWidth="sm">
                 <DialogTitle>Adicionar Novo Departamento</DialogTitle>
                 <Box component="form" onSubmit={handleSubmit}>
