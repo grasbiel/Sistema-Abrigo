@@ -58,7 +58,7 @@ const Layout: React.FC = () => {
                 </ListItem>
                 
                 {/* --- SEÇÃO CONDICIONAL PARA O CONTROLADOR --- */}
-                {/* Verifica se o usuário pertence ao grupo 'ROLE_CONTROLADOR' */}
+                
                 {user?.groups.includes('Controlador') && (
                     <>
                         {/* Divisor para separar os menus de admin */}
@@ -90,7 +90,7 @@ const Layout: React.FC = () => {
             
             <Divider />
 
-            {/* LISTA PARA A AÇÃO DE SAIR */}
+            
             <List>
                  <ListItem disablePadding onClick={logoutUser}>
                     <ListItemButton>
@@ -122,8 +122,8 @@ const Layout: React.FC = () => {
                 {drawer}
             </Drawer>
             <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-                <Toolbar /> {/* Espaçador */}
-                <Outlet /> {/* Onde as páginas são renderizadas */}
+                <Toolbar /> 
+                <Outlet />
             </Box>
         </Box>
     );

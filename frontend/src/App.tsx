@@ -16,31 +16,35 @@ import ValidarMovimentacaoPage from './pages/ValidarMovimentacaoPage';
 import GerenciarCriancasPage from './pages/GerenciarCriancasPage';
 import CadastrarProdutoPage from './pages/CadastrarProdutoPage';
 import GerenciarDepartamentosPage from './pages/GerenciarDepartamentoPages';
+import { NotificationProvider } from './context/NotificationContext';
 
 function App() {
   return (
     // Usamos o <Router> (que na verdade é o BrowserRouter) para envolver toda a aplicação
     <Router>
       <AuthProvider>
-        <Routes>
-          {/* Rotas Públicas */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/" element={<Navigate to="/login" />} />
-          
-          {/* Rotas Protegidas que usam o Layout como "pai" */}
-          <Route element={<ProtectedRoute />}>
-            <Route element={<Layout />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/estoque" element={<EstoquePage />} />
-              <Route path="/registrar-movimentacao" element={<RegistrarMovimentacaoPage />} />
-              <Route path="/validar-movimentacao" element={<ValidarMovimentacaoPage />} />
-              <Route path="/cadastrar-produto" element={<CadastrarProdutoPage />} />
-              <Route path="/gerenciar-criancas" element={<GerenciarCriancasPage />} />
-              <Route path="/gerenciar-departamentos" element={<GerenciarDepartamentosPage />} />
-            </Route>
-          </Route>
+        <NotificationProvider>
 
-        </Routes>
+          <Routes>
+            {/* Rotas Públicas */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/" element={<Navigate to="/login" />} />
+            
+            {/* Rotas Protegidas que usam o Layout como "pai" */}
+            <Route element={<ProtectedRoute />}>
+              <Route element={<Layout />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/estoque" element={<EstoquePage />} />
+                <Route path="/registrar-movimentacao" element={<RegistrarMovimentacaoPage />} />
+                <Route path="/validar-movimentacao" element={<ValidarMovimentacaoPage />} />
+                <Route path="/cadastrar-produto" element={<CadastrarProdutoPage />} />
+                <Route path="/gerenciar-criancas" element={<GerenciarCriancasPage />} />
+                <Route path="/gerenciar-departamentos" element={<GerenciarDepartamentosPage />} />
+              </Route>
+            </Route>
+
+          </Routes>
+        </NotificationProvider>
       </AuthProvider>
     </Router>
   );

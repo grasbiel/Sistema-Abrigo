@@ -7,6 +7,7 @@ import { format, parseISO } from 'date-fns';
 
 import apiClient from '../api/axiosConfig';
 import { Movimentacao } from '../types';
+import { useNotification } from '../context/NotificationContext';
 
 interface PaginatedMovimentacoesResponse {
     count: number;
@@ -16,7 +17,7 @@ interface PaginatedMovimentacoesResponse {
 const ValidarMovimentacaoPage: React.FC = () => {
     const [pendentes, setPendentes] = useState<Movimentacao[]>([]);
     const [loading, setLoading] = useState(true);
-    const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+    const {showNotification} = useNotification()
 
     const fetchPendentes = useCallback(async () => {
         setLoading(true);
@@ -25,7 +26,7 @@ const ValidarMovimentacaoPage: React.FC = () => {
             setPendentes(response.data.results);
         } catch (err) {
             console.error("Erro ao buscar movimentações pendentes:", err);
-            setFeedback({ type: 'error', message: 'Não foi possível carregar as movimentações.' });
+            showNotification('Não foi possível carregar as movimentação', 'error')
         } finally {
             setLoading(false);
         }
@@ -36,27 +37,26 @@ const ValidarMovimentacaoPage: React.FC = () => {
     }, [fetchPendentes]);
 
     const handleAprovar = useCallback(async (id: number) => {
-        setFeedback(null);
+
         try {
             await apiClient.post(`/movimentacoes/${id}/validar/`);
-            setFeedback({ type: 'success', message: 'Movimentação aprovada com sucesso!' });
+            showNotification('Movimentação aprovada com sucesso!', 'success')
             fetchPendentes();
         } catch (err) {
-            setFeedback({ type: 'error', message: 'Erro ao aprovar a movimentação.' });
+            showNotification('Erro ao aprovar a movimentação.', 'error')
         }
-    }, [fetchPendentes]);
+    }, [fetchPendentes, showNotification]);
 
     const handleRecusar = useCallback(async (id: number) => {
-        setFeedback(null);
         try {
-            await apiClient.post(`/movimentacoes/${id}/recusar/`);
-            setFeedback({ type: 'success', message: 'Movimentação recusada.' });
+            await apiClient.post(`/movimentacoes/${id}/recusar/`)
+            showNotification('Movimentação recusada.', 'success');
             fetchPendentes();
 
         } catch (err) {
-            setFeedback({ type: 'error', message: 'Erro ao recusar a movimentação.' });
+            showNotification('Erro ao recusar a movimentação.', 'error')
         }
-    }, [fetchPendentes]);
+    }, [fetchPendentes, showNotification]);
 
     const columns: GridColDef[] = [
         { field: 'produto_nome', headerName: 'Produto', flex: 1.5 },
@@ -110,7 +110,6 @@ const ValidarMovimentacaoPage: React.FC = () => {
                 Validar Movimentações Pendentes
             </Typography>
 
-            {feedback && <Alert severity={feedback.type} sx={{ mb: 2 }}>{feedback.message}</Alert>}
             
             <Paper sx={{ height: 600, width: '100%' }}>
                 <DataGrid

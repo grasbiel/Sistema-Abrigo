@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Box, Typography, Paper, Grid, TextField, Button, Alert, CircularProgress, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 
 import apiClient from '../api/axiosConfig';
+import { useNotification } from '../context/NotificationContext';
 
 // Tipo para um único Departamento
 interface Departamento {
@@ -31,6 +32,7 @@ const CadastrarProdutoPage: React.FC = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const navigate = useNavigate();
+    const {showNotification} = useNotification();
 
     useEffect(() => {
         const fetchDepartamentos = async () => {
@@ -41,7 +43,7 @@ const CadastrarProdutoPage: React.FC = () => {
                 setDepartamentos(response.data.results);
 
             } catch (err) {
-                setError('Não foi possível carregar os departamentos.');
+                showNotification('Não foi possível carregar os departamentos', 'error')
             } finally {
                 setLoading(false);
             }
@@ -56,11 +58,9 @@ const CadastrarProdutoPage: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setError('');
-        setSuccess('');
 
         if (!formData.nome || !formData.departamento || !formData.unidade_medida) {
-            setError('Nome, Departamento e Unidade de Medida são obrigatórios.');
+            showNotification('Nome, departamento e unidade de medida são obrigatórios.', 'error')
             return;
         }
 
@@ -71,10 +71,11 @@ const CadastrarProdutoPage: React.FC = () => {
                 quantidade_minima: parseFloat(formData.quantidade_minima),
                 departamento: parseInt(formData.departamento),
             });
-            setSuccess(`Produto "${formData.nome}" cadastrado com sucesso!`);
+            showNotification(`Produto "${formData.nome}" cadastrado com sucesso`, 'success')
             setTimeout(() => navigate('/estoque'), 2000);
         } catch (err) {
-            setError('Falha ao cadastrar o produto. Verifique os dados e tente novamente.');
+            showNotification('Falha ao cadastrar o produto. Verifique os dados e tente novamente.', 'error')
+            
         }
     };
 
