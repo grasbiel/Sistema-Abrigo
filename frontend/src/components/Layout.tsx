@@ -11,7 +11,7 @@ import EscalatorWarningIcon from '@mui/icons-material/EscalatorWarning';
 import CategoryIcon from '@mui/icons-material/Category';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import LogoutIcon from '@mui/icons-material/Logout';
-
+import NotificationBell from './NotificationBell'
 import AuthContext from '../context/AuthContext';
 
 const drawerWidth = 240;
@@ -109,6 +109,11 @@ const Layout: React.FC = () => {
                     <Typography variant="h6" noWrap component="div">
                         Sistema de Gestão do Abrigo
                     </Typography>
+                    {
+                        user?.groups.includes('Controlador') && (
+                            <NotificationBell />
+                        )
+                    }
                 </Toolbar>
             </AppBar>
             <Drawer

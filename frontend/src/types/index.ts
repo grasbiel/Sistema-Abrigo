@@ -101,12 +101,13 @@ export interface Movimentacao {
   data_movimentacao: string; // Data e hora vêm como string (ISO 8601)
 }
 
-
-/**
- * =================================================================
- * TIPOS DE RESPOSTAS DE API ESPECÍFICAS
- * =================================================================
- */
+export interface Notificacao {
+  id:number
+  produto_nome: string
+  mensagem: string
+  data_criacao: string
+  lida: boolean
+}
 
 /**
  * Define a forma dos dados para o Dashboard.
